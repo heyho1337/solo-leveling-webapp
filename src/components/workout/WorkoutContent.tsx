@@ -16,31 +16,17 @@ const WORKOUT_CATEGORIES = [
   'Running',
   'MartialArts',
   'Calisthenics',
-  'Cardio',
   'Yoga',
   'Swimming',
+  'Crossfit',
+  'Biking'
 ] as const;
-
-const getWorkoutTypeFromCategory = (category: string) => {
-  const map: Record<string, string> = {
-    Weightlifting: 'STRENGTH',
-    Running: 'CARDIO',
-    MartialArts: 'COMBAT',
-    Calisthenics: 'STRENGTH',
-    Cardio: 'CARDIO',
-    Yoga: 'FLEXIBILITY',
-    Swimming: 'CARDIO',
-  };
-
-  return map[category] ?? 'GENERAL';
-};
 
 const defaultFormData = {
   name: '',
   category: 'Weightlifting',
   description: '',
-  estimatedDurationMinutes: 30,
-  difficultyLevel: 1,
+  duration: 0,
   calories: 180,
   selectedExerciseIds: [] as string[],
 };
@@ -92,11 +78,6 @@ export function WorkoutContent({
     onLoadMore: () => setWorkoutPage((prev) => prev + 1),
   });
 
-  const computedBaseXp = Math.max(
-    100,
-    formData.difficultyLevel * 100 + formData.estimatedDurationMinutes * 10,
-  );
-
   const resetForm = () => {
     setFormData(defaultFormData);
   };
@@ -109,11 +90,9 @@ export function WorkoutContent({
       const payload = {
         name: formData.name.trim(),
         category: formData.category,
-        workoutType: getWorkoutTypeFromCategory(formData.category),
+        workoutType: formData.category,
         description: formData.description.trim(),
-        estimatedDurationMinutes: formData.estimatedDurationMinutes,
-        difficultyLevel: formData.difficultyLevel,
-        baseXp: computedBaseXp,
+        duration: formData.duration,
         calories: formData.calories,
         isPreset: false,
         exercises: formData.selectedExerciseIds.map((exerciseId) =>
@@ -164,8 +143,7 @@ export function WorkoutContent({
       name: workout.name,
       category: workout.category,
       description: workout.description,
-      estimatedDurationMinutes: workout.estimatedDurationMinutes,
-      difficultyLevel: workout.difficultyLevel,
+      duration: workout.duration,
       calories: workout.calories || 0,
       selectedExerciseIds: newSelectedExerciseIds,
     });
@@ -198,7 +176,7 @@ export function WorkoutContent({
       <WorkoutModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingWorkout ? 'Edit Protocol' : 'New Training Protocol'}
+        title={editingWorkout ? 'Edit workout' : 'New workout'}
       >
         <WorkoutForm
           formData={formData}
@@ -206,7 +184,6 @@ export function WorkoutContent({
           exerciseOptions={exerciseOptions}
           workoutCategoryOptions={workoutCategoryOptions}
           exercises={exercises}
-          computedBaseXp={computedBaseXp}
           isSubmitting={isSubmitting}
           editingWorkout={!!editingWorkout}
           handleSubmit={handleSubmit}

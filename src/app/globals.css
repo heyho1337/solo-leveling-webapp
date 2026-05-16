@@ -17,6 +17,29 @@
   --system-glow: 0 0 30px rgba(56, 189, 248, 0.4);
 }
 
+*{
+  scrollbar-width: thin;
+  scrollbar-color: #38bdf8 rgb(0, 0, 0);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #38bdf8;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

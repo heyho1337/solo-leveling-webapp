@@ -58,11 +58,11 @@ export function formatWorkoutExercise(
   if (wkg != null && Number(wkg) > 0) {
     details.push(`${wkg}kg`);
   }
-  if (item.durationMinutes != null && item.durationMinutes > 0) {
-    details.push(`${item.durationMinutes}s`);
+  if (item.duration != null && item.duration > 0) {
+    details.push(`${item.duration}s`);
   }
-  if (item.distanceMeters != null && item.distanceMeters > 0) {
-    details.push(`${item.distanceMeters}m`);
+  if (item.distance != null && item.distance > 0) {
+    details.push(`${item.distance}m`);
   }
 
   if (details.length === 0) {

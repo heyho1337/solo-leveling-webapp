@@ -43,7 +43,7 @@ export function WorkoutCard({ workout, index, exercises, onEdit, onDelete }: Wor
                 variant="ghost"
                 size="sm"
                 onClick={() => onEdit(workout)}
-                className="h-6 px-2 text-[8px] text-white/60 hover:text-[#38bdf8] hover:bg-[#38bdf8]/10"
+                className="h-6 px-2 text-[12px] text-white/80 font-black border border-white/40 hover:text-[#38bdf8] hover:bg-[#38bdf8]/10"
               >
                 <Edit2 className="h-3 w-3 mr-1" />
                 EDIT
@@ -55,7 +55,7 @@ export function WorkoutCard({ workout, index, exercises, onEdit, onDelete }: Wor
                   variant="ghost"
                   size="sm"
                   onClick={() => onDelete(workoutId)}
-                  className="h-6 px-2 text-[8px] text-white/60 hover:text-red-400 hover:bg-red-400/10"
+                  className="h-6 px-2 text-[12px] text-white/80 font-black border border-white/40 hover:text-red-400 hover:bg-red-400/10"
                 >
                   <Trash2 className="h-3 w-3 mr-1" />
                   DELETE
@@ -64,29 +64,24 @@ export function WorkoutCard({ workout, index, exercises, onEdit, onDelete }: Wor
             </div>
           </div>
 
-          <CardTitle className="text-white tracking-widest mt-2">
+          <CardTitle className="text-[14px] text-white/80 uppercase font-black system-text-glow-strong tracking-widest mt-2">
             {workout.name}
           </CardTitle>
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col">
-          <p className="text-xs text-white/60 mb-6 line-clamp-2">
-            {workout.description || 'Standard training protocol assigned by The System.'}
+          <p className="text-[12px] text-white/60 mb-6 line-clamp-2">
+            {workout.description || 'Quest assigned by The System.'}
           </p>
 
           <div className="mt-auto space-y-4">
-            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-white/40">
+            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-white/80">
               <span>Calories</span>
-              <span className="text-orange-300">{workout.calories || 0} KCAL</span>
-            </div>
-
-            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-white/40">
-              <span>Exp Yield</span>
-              <span className="text-[#4ade80]">+{workout.baseXp} XP</span>
+              <span className="text-[#38bdf8] system-text-glow-strong">{workout.calories} KCAL</span>
             </div>
 
             <div className="pt-2 space-y-2">
-              <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">
+              <p className="text-[14px] text-white/80 uppercase font-black system-text-glow-strong tracking-widest">
                 Exercises
               </p>
 
@@ -94,9 +89,9 @@ export function WorkoutCard({ workout, index, exercises, onEdit, onDelete }: Wor
                 <p className="text-[10px] text-white/25">No exercises linked yet.</p>
               ) : (
                 <ul className="space-y-2">
-                  {linkedExercises.slice(0, 6).map((exercise, idx) => (
+                  {linkedExercises.map((exercise, idx) => (
                     <li key={`${workoutKey}-${idx}`} className="text-[10px] grid gap-2 text-white/70">
-                      <span className="font-bold text-white/90">{exercise.name}</span>
+                      <span className="font-bold text-[14px] text-white/80">{exercise.name}</span>
 
                       <ExerciseStat exercise={exercise} category={exercise.category} />
                     </li>

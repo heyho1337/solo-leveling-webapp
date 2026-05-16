@@ -5,8 +5,7 @@ export interface WorkoutFormProps {
     name: string;
     category: string;
     description: string;
-    estimatedDurationMinutes: number;
-    difficultyLevel: number;
+    duration: number;
     calories: number;
     selectedExerciseIds: string[];
   };
@@ -15,8 +14,7 @@ export interface WorkoutFormProps {
       name: string;
       category: string;
       description: string;
-      estimatedDurationMinutes: number;
-      difficultyLevel: number;
+      duration: number;
       calories: number;
       selectedExerciseIds: string[];
     }>
@@ -24,7 +22,6 @@ export interface WorkoutFormProps {
   exerciseOptions: { id: string; label: string; description: string }[];
   workoutCategoryOptions: { id: string; label: string }[];
   exercises: Exercise[];
-  computedBaseXp: number;
   isSubmitting: boolean;
   editingWorkout: boolean;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;

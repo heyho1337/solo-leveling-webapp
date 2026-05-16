@@ -18,15 +18,29 @@ export default async function QuestsPage() {
     const userData = userRes.data as User;
     if (!userData.hasCompletedQuestionnaire) redirect("/onboarding");
 
-    const questResponse = await api.get('/users/me/quests', {
+    const activeQuests = await api.get('/users/me/quests/active', {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+    const activeQuestData = activeQuests.data;
+    console.log(activeQuestData);
 
-    const questData = questResponse.data;
-
-    console.log(questData);
+    const completedQuests = await api.get('/users/me/quests/completed', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const completedQuestData = completedQuests.data;
+    console.log(completedQuestData);
+    
+    const missedQuests = await api.get('/users/me/quests/missed', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    const missedQuestData = missedQuests.data;
+    console.log(missedQuestData);
 
     const workoutResponse = await api.get('/users/me/workout', {
       headers: {
@@ -36,7 +50,11 @@ export default async function QuestsPage() {
 
     const workoutData = workoutResponse.data;
 
-    return <QuestContent quests={questData} workouts={workoutData} />;
+    return <QuestContent 
+      activeQuests={activeQuestData}
+      completedQuests={completedQuestData}
+      missedQuests={missedQuestData}
+      workouts={workoutData} />;
   } catch (error: any) {
     if (error?.response?.status === 401) redirect("/login");
     redirect("/login");

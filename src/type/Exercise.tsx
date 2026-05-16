@@ -5,8 +5,8 @@ export type Exercise = {
   category?: string;
   description?: string;
   targetStat?: string;
-  durationMinutes?: number | null;
-  distanceMeters?: number | null;
+  duration?: number | null;
+  distance?: number | null;
   setCount?: number | null;
   repCount?: number | null;
   weightKg?: number | null;

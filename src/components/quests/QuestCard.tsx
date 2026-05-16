@@ -9,16 +9,15 @@ import {
 import { Quest } from '@/type/Quest';
 import { Workout } from '@/type/Workout';
 import { Exercise } from '@/type/Exercise';
+import { ExerciseStat } from '../exercise/ExerciseStat';
 
 export function QuestCard({
   quest,
-  headerRight,
   className = '',
   onEdit,
   onDelete,
 }: {
   quest: Quest;
-  headerRight?: ReactNode;
   className?: string;
   onEdit?: (quest: Quest) => void;
   onDelete?: (questId: string) => void;
@@ -29,10 +28,8 @@ export function QuestCard({
   const description = quest?.description || workout?.description || 'No description provided.';
 
   const rewardsText = useMemo(() => {
-    const gold = quest.calculatedGold;
-    const xp = quest.calculatedXp;
-    return `+${gold} Gold / +${xp} XP`;
-  }, [quest, quest.calculatedXp, workout]);
+    return `+${quest.gold} Gold / +${quest.xp} XP`;
+  }, [quest, quest.xp, workout]);
 
   return (
     <Card key={getResourceId(quest)} className={`border-primary/30 group ${className}`}>
@@ -42,7 +39,6 @@ export function QuestCard({
             {title}
           </CardTitle>
           <div className="flex items-center gap-2">
-            {headerRight}
             {onEdit && onDelete && (
               <>
                 <button
@@ -59,9 +55,6 @@ export function QuestCard({
                 </button>
               </>
             )}
-            <span className="bg-primary/20 text-primary text-[10px] px-2 py-1 rounded-sm font-black border border-primary/20 tracking-widest uppercase">
-              {quest.scheduledFor ? 'Scheduled' : 'Daily'}
-            </span>
           </div>
         </div>
       </CardHeader>
@@ -76,7 +69,7 @@ export function QuestCard({
                   Workout Duration
                 </p>
                 <p className="text-white font-black text-sm uppercase">
-                  {workout.estimatedDurationMinutes ?? 0} MINS
+                  {workout.duration ?? 0} MINS
                 </p>
               </div>
               <div className="bg-black/40 p-3 border border-white/5">
@@ -84,7 +77,7 @@ export function QuestCard({
                   Calories
                 </p>
                 <p className="text-orange-300 font-black text-sm uppercase">
-                  {quest.calculatedCalories ?? workout.calories ?? 0} KCAL
+                  {quest.calories} KCAL
                 </p>
               </div>
             </div>
@@ -96,20 +89,10 @@ export function QuestCard({
                 </p>
                 <ul className="space-y-3 max-h-56 overflow-y-auto pr-1">
                   {(workout.exercises as Exercise[]).map((item, index) => {
-                    const { label, detail, description: exDesc } = formatWorkoutExercise(item);
-                    const exerciseId = getResourceId(item);
                     return (
-                      <li
-                        key={exerciseId ? `${getResourceId(workout)}-ex-${exerciseId}` : `${getResourceId(workout)}-ex-${index}`}
-                        className="text-[10px] text-white/70"
-                      >
-                        <div className="flex items-baseline justify-between gap-4">
-                          <span className="font-bold text-white/90">{item.name}</span>
-                          <span className="text-white/40 shrink-0">{detail}</span>
-                        </div>
-                        {exDesc ? (
-                          <p className="mt-1 text-[9px] text-white/40 line-clamp-2">{exDesc}</p>
-                        ) : null}
+                      <li key={`workout-${workout.id}-exercise-${item.id}`} className="text-[10px] grid gap-2 text-white/70">
+                        <span className="font-bold text-[14px] text-white/80">{item.name}</span>
+                        <ExerciseStat exercise={item} category={item.category} />
                       </li>
                     );
                   })}

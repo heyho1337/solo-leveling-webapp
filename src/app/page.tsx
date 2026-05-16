@@ -26,12 +26,12 @@ export default function Home() {
             <div className="flex items-center justify-center gap-12 pt-6">
               <Link title="Register" href="/register">
                 <Button variant="outline" className="pointer h-12 border-white text-white text-xs tracking-widest hover:bg-white hover:text-black transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.4)] hover:shadow-[0_0_20px_rgba(255,255,255,0.8)]">
-                  Start Awakening
+                  Register
                 </Button>
               </Link>
               <Link title="Login" href="/login">
                 <Button variant="outline" className="pointer h-12 border-white text-white text-xs tracking-widest hover:bg-white hover:text-black transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.4)] hover:shadow-[0_0_20px_rgba(255,255,255,0.8)]">
-                  Player Login
+                  Login
                 </Button>
               </Link>
             </div>
@@ -44,7 +44,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="relative z-10 py-12 text-center text-white/20 text-[10px] font-bold">
-        <p>© 2026 Solo Leveling Fitness System. All rights reserved.</p>
+        <p>© 2026 heyhodesigns</p>
       </footer>
     </div>
   );

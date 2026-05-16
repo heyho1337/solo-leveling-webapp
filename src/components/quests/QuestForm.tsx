@@ -69,6 +69,7 @@ export function QuestForm({
           noResultsLabel="No workouts found"
         />
 
+        {/*
         {formData.selectedWorkoutId ? (
           <div className="flex items-center justify-between gap-4 rounded border border-white/10 bg-white/5 px-3 py-2 text-[10px] uppercase tracking-[0.3em] text-white/80">
             <span>
@@ -91,10 +92,7 @@ export function QuestForm({
             </button>
           </div>
         ) : null}
-
-        <p className="text-[10px] text-white/50">
-          Optional: select a workout template to assign a quest automatically.
-        </p>
+        */}
       </div>
 
       <div className="space-y-1">

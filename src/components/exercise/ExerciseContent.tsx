@@ -17,20 +17,32 @@ const getExerciseTypeFromCategory = (category: string) => {
     Cardio: 'CARDIO',
     Combat: 'COMBAT',
     Flexibility: 'FLEXIBILITY',
-    Bodyweight: 'STRENGTH',
-    'Full Body': 'STRENGTH',
+    Calisthenics: 'STRENGTH',
+    Crossfit: 'STRENGTH',
   };
   return map[category] ?? 'GENERAL';
 };
 
+const EXERCISE_CATEGORIES = [
+  'Weightlifting',
+  'Running',
+  'MartialArts',
+  'Calisthenics',
+  'Yoga',
+  'Swimming',
+  'Crossfit',
+  'Biking'
+] as const;
+
 const getTargetStatFromCategory = (category: string) => {
   const map: Record<string, string> = {
-    Strength: 'strength',
-    Cardio: 'endurance',
-    Combat: 'power',
-    Flexibility: 'flexibility',
-    Bodyweight: 'strength',
-    'Full Body': 'stamina',
+    Weightlifting: 'strength',
+    Running: 'endurance',
+    MartialArts: 'power',
+    Yoga: 'flexibility',
+    Calisthenics: 'strength',
+    Crossfit: 'stamina',
+    Swimming: 'stamina',
   };
   return map[category] ?? 'stamina';
 };
@@ -45,8 +57,8 @@ type ExerciseFormData = {
   description: string;
   repCount: number;
   setCount: number;
-  durationMinutes: number;
-  distanceMeters: number;
+  duration: number;
+  distance: number;
   weightKg: number;
 };
 
@@ -56,8 +68,8 @@ const defaultFormData: ExerciseFormData = {
   description: '',
   repCount: 10,
   setCount: 4,
-  durationMinutes: 60,
-  distanceMeters: 500,
+  duration: 0,
+  distance: 500,
   weightKg: 20,
 };
 
@@ -71,8 +83,7 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
   const [formData, setFormData] = useState<ExerciseFormData>(defaultFormData);
 
   const categoryOptions = useMemo(() => {
-    const categories = ['Strength', 'Cardio', 'Combat', 'Flexibility', 'Bodyweight', 'Full Body'];
-    return categories.map((category) => ({ id: category, label: category }));
+    return EXERCISE_CATEGORIES.map((category) => ({ id: category, label: category }));
   }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -83,12 +94,12 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
       name: formData.name,
       category: formData.category,
       description: formData.description.trim() || 'No description provided.',
-      exerciseType: getExerciseTypeFromCategory(formData.category),
+      exerciseType: formData.category,
       targetStat: getTargetStatFromCategory(formData.category),
       repCount: formData.repCount,
       setCount: formData.setCount,
-      durationMinutes: formData.durationMinutes,
-      distanceMeters: formData.distanceMeters,
+      duration: formData.duration,
+      distance: formData.distance,
       weightKg: String(formData.weightKg),
       isPreset: false,
     };
@@ -103,7 +114,7 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
         setExercisesList((prev) =>
           prev.map((ex) =>
             getResourceId(ex) === exerciseId
-              ? { ...ex, ...payload, repCount: payload.repCount, setCount: payload.setCount, durationMinutes: payload.durationMinutes, distanceMeters: payload.distanceMeters, weightKg: payload.weightKg }
+              ? { ...ex, ...payload, repCount: payload.repCount, setCount: payload.setCount, duration: payload.duration, distance: payload.distance, weightKg: payload.weightKg }
               : ex
           )
         );
@@ -134,8 +145,8 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
       description: exercise.description || '',
       repCount: exercise.repCount || 10,
       setCount: exercise.setCount || 4,
-      durationMinutes: exercise.durationMinutes || 60,
-      distanceMeters: exercise.distanceMeters || 500,
+      duration: exercise.duration || 0,
+      distance: exercise.distance || 500,
       weightKg: exercise.weightKg || 20,
     });
     setIsModalOpen(true);

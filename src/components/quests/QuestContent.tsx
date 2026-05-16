@@ -20,11 +20,15 @@ const defaultFormData = {
 };
 
 export default function QuestContent({
-  quests: initialQuests,
+  activeQuests: activeQuests = [],
   workouts = [],
+  completedQuests: completedQuests = [],
+  missedQuests: missedQuests = [], 
 }: QuestContentProps) {
   // Local state for optimistic CRUD updates
-  const [questsList, setQuestsList] = useState<Quest[]>(initialQuests);
+  const [activeQuestsList, setActiveQuestsList] = useState<Quest[]>(activeQuests);
+  const [completedQuestsList, setCompletedQuestsList] = useState<Quest[]>(completedQuests);
+  const [missedQuestsList, setMissedQuestsList] = useState<Quest[]>(missedQuests);
   const [searchQuery, setSearchQuery] = useState("");
   const isLoading = false;
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,6 +36,7 @@ export default function QuestContent({
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
   const [activePage, setActivePage] = useState(1);
   const [completedPage, setCompletedPage] = useState(1);
+  const [missedPage, setMissedPage] = useState(1);
 
   const [formData, setFormData] = useState(defaultFormData);
 
@@ -39,39 +44,40 @@ export default function QuestContent({
     setSearchQuery(e.target.value);
     setActivePage(1);
     setCompletedPage(1);
+    setMissedPage(1);
   };
 
   const normalizedSearch = searchQuery.trim().toLowerCase();
 
-  const activeQuests = useMemo(() => {
-    const source = questsList.filter(
-      (q) =>
-        String(q.status ?? "").toLowerCase() === "active" &&
-        !q.isHidden
-    );
+  activeQuests = useMemo(() => {
+    if (!normalizedSearch) return activeQuests;
 
-    if (!normalizedSearch) return source;
-
-    return source.filter((item) =>
+    return activeQuests.filter((item) =>
       [item.name, item.description, item.workout?.name]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch))
     );
-  }, [questsList, normalizedSearch]);
+  }, [activeQuests, normalizedSearch]);
 
-  const completedQuests = useMemo(() => {
-    const source = questsList.filter(
-      (q) => String(q.status ?? "").toLowerCase() === "completed"
-    );
+  completedQuests = useMemo(() => {
+    if (!normalizedSearch) return completedQuests;
 
-    if (!normalizedSearch) return source;
-
-    return source.filter((item) =>
+    return completedQuests.filter((item) =>
       [item.name, item.description, item.workout?.name]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch))
     );
-  }, [questsList, normalizedSearch]);
+  }, [completedQuests, normalizedSearch]);
+
+  missedQuests = useMemo(() => {
+    if (!normalizedSearch) return missedQuests;
+
+    return missedQuests.filter((item) =>
+      [item.name, item.description, item.workout?.name]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(normalizedSearch))
+    );
+  }, [missedQuests, normalizedSearch]);
 
   const visibleActiveQuests = useMemo(
     () => activeQuests.slice(0, activePage * 6),
@@ -81,6 +87,11 @@ export default function QuestContent({
   const visibleCompletedQuests = useMemo(
     () => completedQuests.slice(0, completedPage * 6),
     [completedQuests, completedPage]
+  );
+
+  const visibleMissedQuests = useMemo(
+    () => missedQuests.slice(0, missedPage * 6),
+    [missedQuests, missedPage]
   );
 
   const activeSentinelRef = useInfiniteScroll({
@@ -93,6 +104,12 @@ export default function QuestContent({
     loading: isLoading,
     hasMore: completedQuests.length > visibleCompletedQuests.length,
     onLoadMore: () => setCompletedPage((prev) => prev + 1),
+  });
+
+  const missedSentinelRef = useInfiniteScroll({
+    loading: isLoading,
+    hasMore: missedQuests.length > visibleMissedQuests.length,
+    onLoadMore: () => setMissedPage((prev) => prev + 1),
   });
 
   const workoutOptions = useMemo(
@@ -145,7 +162,7 @@ export default function QuestContent({
     if (!questId) return;
 
     // Optimistic removal
-    setQuestsList((prev) => prev.filter((q) => getResourceId(q) !== questId));
+    setActiveQuestsList((prev) => prev.filter((q) => getResourceId(q) !== questId));
 
     try {
       await api.delete(`/users/me/quests/${questId}`);
@@ -179,7 +196,7 @@ export default function QuestContent({
         });
 
         // Optimistic update
-        setQuestsList((prev) =>
+        setActiveQuestsList((prev) =>
           prev.map((q) => {
             const qId = getResourceId(q) || q.id;
             if (qId === questId) {
@@ -209,7 +226,7 @@ export default function QuestContent({
         const newQuest = response.data as Quest;
 
         // Optimistic add
-        setQuestsList((prev) => [...prev, newQuest]);
+        setActiveQuestsList((prev) => [...prev, newQuest]);
       }
 
       setIsModalOpen(false);
@@ -254,10 +271,13 @@ export default function QuestContent({
         isLoading={isLoading}
         activeQuests={activeQuests}
         completedQuests={completedQuests}
+        missedQuests={missedQuests}
         visibleActiveQuests={visibleActiveQuests}
         visibleCompletedQuests={visibleCompletedQuests}
+        visibleMissedQuests={visibleMissedQuests}
         activeSentinelRef={activeSentinelRef}
         completedSentinelRef={completedSentinelRef}
+        missedSentinelRef={missedSentinelRef}
         onEdit={handleEdit}
         onDelete={handleDelete}
         handleOpenCreate={handleOpenCreate}

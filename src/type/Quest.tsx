@@ -8,13 +8,10 @@ export type Quest = {
   status?: string;
   progress?: number;
   completedAt?: string;
-  calculatedCalories?: number;
-  calculatedXp?: number;
+  calories?: number;
+  xp?: number;
   isHidden?: boolean;
   isPreset?: boolean;
-  rewardGold?: number;
-  rewardXp?: number;
-  baseXp?: number;
-  calculatedGold?: number;
+  gold?: number;
   workout?: Workout | null;
 };

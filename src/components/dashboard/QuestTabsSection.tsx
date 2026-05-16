@@ -18,7 +18,7 @@ export const QuestTabsSection = ({ activeTab, onTabChange }: QuestTabsSectionPro
         <Button
           key={tab.id}
           variant={activeTab === tab.id ? "primary" : "ghost"}
-          className="h-9 text-[10px] tracking-widest"
+          className="h-9 text-[14px] font-black uppercase"
           onClick={() => onTabChange(tab.id as "daily" | "weekly" | "bonus")}
         >
           {tab.label}

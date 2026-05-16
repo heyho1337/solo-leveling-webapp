@@ -14,8 +14,8 @@ interface FormData {
   description: string;
   repCount: number;
   setCount: number;
-  durationMinutes: number;
-  distanceMeters: number;
+  duration: number;
+  distance: number;
   weightKg: number;
 }
 
@@ -45,7 +45,7 @@ export const ExerciseForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1">
         <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
-          Movement Name
+          Name
         </label>
         <Input
           required
@@ -78,12 +78,17 @@ export const ExerciseForm = ({
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setFormData({ ...formData, description: e.target.value })
           }
-          placeholder="Movement details (optional)"
+          placeholder="Description (optional)"
         />
       </div>
 
-      {(formData.category === 'Strength' || formData.category === 'Full Body') && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {(formData.category === 'Weightlifting' || 
+        formData.category === 'MartialArts' || 
+        formData.category === 'Calisthenics' || 
+        formData.category === 'Crossfit'
+      ) && (
+
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(176px,1fr))] gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
               Sets
@@ -91,7 +96,8 @@ export const ExerciseForm = ({
             <NumberInput
               value={formData.setCount}
               onChange={(value) => setFormData({ ...formData, setCount: value })}
-              min={1}
+              min={0}
+              step={0.5}
             />
           </div>
           <div className="space-y-1">
@@ -101,33 +107,34 @@ export const ExerciseForm = ({
             <NumberInput
               value={formData.repCount}
               onChange={(value) => setFormData({ ...formData, repCount: value })}
-              min={0}
-              step={0.5}
+              min={1}
             />
           </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
-              Weight (kg)
-            </label>
-            <NumberInput
-              value={formData.weightKg}
-              onChange={(value) => setFormData({ ...formData, weightKg: value })}
-              min={0}
-              step={0.5}
-            />
-          </div>
+          {(formData.category === 'Weightlifting' || formData.category === 'Crossfit') && (
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
+                Weight (kg)
+              </label>
+              <NumberInput
+                value={formData.weightKg}
+                onChange={(value) => setFormData({ ...formData, weightKg: value })}
+                min={0}
+                step={0.5}
+              />
+            </div>
+          )}
         </div>
       )}
 
-      {formData.category === 'Cardio' && (
+      {(formData.category === 'Running' || formData.category === 'Swimming' || formData.category === 'Riding' ) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
               Minutes
             </label>
             <NumberInput
-              value={formData.durationMinutes}
-              onChange={(value) => setFormData({ ...formData, durationMinutes: value })}
+              value={formData.duration}
+              onChange={(value) => setFormData({ ...formData, duration: value })}
               min={1}
             />
           </div>
@@ -136,29 +143,16 @@ export const ExerciseForm = ({
               Distance (m)
             </label>
             <NumberInput
-              value={formData.distanceMeters}
-              onChange={(value) => setFormData({ ...formData, distanceMeters: value })}
+              value={formData.distance}
+              onChange={(value) => setFormData({ ...formData, distance: value })}
               min={1}
             />
           </div>
         </div>
       )}
 
-      {(formData.category === 'Combat' || formData.category === 'Flexibility' || formData.category === 'Bodyweight') && (
-        <div className="space-y-1">
-          <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
-            Reps
-          </label>
-          <NumberInput
-            value={formData.repCount}
-            onChange={(value) => setFormData({ ...formData, repCount: value })}
-            min={1}
-          />
-        </div>
-      )}
-
       <Button type="submit" disabled={isSubmitting} className="w-full h-12">
-        {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : editingExercise ? 'CONFIRM UPDATE' : 'REGISTER TO ARCHIVE'}
+        {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : editingExercise ? 'Update Exercise' : 'Save Exercise'}
       </Button>
     </form>
   );

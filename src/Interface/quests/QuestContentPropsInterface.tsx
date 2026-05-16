@@ -2,6 +2,8 @@ import { Quest } from "./QuestInterface";
 import { Workout } from "./WorkoutInterface";
 
 export interface QuestContentProps {
-  quests: Quest[];
+  activeQuests: Quest[];
+  completedQuests: Quest[];
+  missedQuests: Quest[];
   workouts: Workout[];
 }

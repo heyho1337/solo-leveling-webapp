@@ -3,26 +3,26 @@ import { ExerciseStatProps } from '@/Interface/exercise/ExerciseStatPropsInterfa
 
 export const ExerciseStat = ({ exercise, category }: ExerciseStatProps) => {
     return (
-        <div className="grid grid-cols-2 gap-2 text-[8px] uppercase tracking-[0.2em] text-white/40 mb-3">
-          {(category === 'Strength' || category === 'Full Body') && (
+        <div className="grid grid-cols-2 gap-2 text-[12px] text-white/80 mb-3">
+          {(category === 'Weightlifting' || category === 'Crossfit' || category === 'Calisthenics') && (
             <>
-              {exercise.setCount != null && <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Sets: {exercise.setCount}</span>}
-              {exercise.repCount != null && <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Reps: {exercise.repCount}</span>}
-              {exercise.weightKg != null && <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Weight: {exercise.weightKg} kg</span>}
+              {exercise.setCount != null && <span className="px-2 py-1 rounded-sm bg-sky-400/10">Sets: {exercise.setCount}</span>}
+              {exercise.repCount != null && <span className="px-2 py-1 rounded-sm bg-sky-400/10">Reps: {exercise.repCount}</span>}
+              {exercise.weightKg != null && <span className="px-2 py-1 rounded-sm bg-sky-400/10">Weight: {exercise.weightKg} kg</span>}
             </>
           )}
-          {category === 'Cardio' && (
+          {(category === 'Running' || category === 'Swimming' || category === 'Riding') && (
             <>
-              {exercise.durationMinutes != null && <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Duration: {exercise.durationMinutes} min</span>}
-              {exercise.distanceMeters != null && <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Distance: {exercise.distanceMeters} m</span>}
+              {exercise.duration != null && <span className="px-2 py-1 rounded-sm bg-sky-400/10">Duration: {exercise.duration} min</span>}
+              {exercise.distance != null && <span className="px-2 py-1 rounded-sm bg-sky-400/10">Distance: {exercise.distance} m</span>}
             </>
           )}
-          {(category === 'Combat' || category === 'Flexibility' || category === 'Bodyweight') && (
+          {category === 'MartialArts' && (
             <>
-              {exercise.repCount != null && <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Reps: {exercise.repCount}</span>}
+              {exercise.repCount != null && <span className="px-2 py-1 rounded-sm bg-sky-400/10">Reps: {exercise.repCount}</span>}
             </>
           )}
-          <span className="border border-white/10 px-2 py-1 rounded-sm bg-white/5">Stat gain: {exercise.targetStat}</span>
+          <span className="px-2 py-1 rounded-sm bg-sky-400/10">Stat gain: {exercise.targetStat}</span>
         </div>
     );
 }

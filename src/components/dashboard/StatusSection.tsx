@@ -25,7 +25,7 @@ export const StatusSection = ({ stats }: StatusSectionProps) => {
     <section className="statusSection">
       <CardHeader>
         <CardTitle className="text-[20px] font-black uppercase tracking-widest text-white/60">
-          Status
+          Stats
         </CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-3">
@@ -40,7 +40,7 @@ export const StatusSection = ({ stats }: StatusSectionProps) => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
             >
-              <span className="text-[8px] system-text-glow-strong font-black uppercase tracking-[0.2em] text-white/80">
+              <span className="text-[10px] system-text-glow-strong font-black uppercase tracking-[0.2em] text-white/80">
                 {stat.label}
               </span>
               <div className="text-[14px] system-text-glow-strong font-black text-white/70">

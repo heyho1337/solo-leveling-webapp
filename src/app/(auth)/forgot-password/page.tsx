@@ -81,7 +81,7 @@ export default function ForgotPasswordPage() {
       </main>
 
       <footer className="relative z-10 py-12 text-center text-white/20 text-[10px] font-bold">
-        <p>© 2026 Solo Leveling Fitness System. All rights reserved.</p>
+        <p>© 2026 heyhodesigns</p>
       </footer>
     </div>
   );

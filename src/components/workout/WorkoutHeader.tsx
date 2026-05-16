@@ -10,11 +10,8 @@ export function WorkoutHeader({ onAddClick }: WorkoutHeaderProps) {
     <div className="flex justify-between items-center">
       <div>
         <h2 className="text-3xl font-black uppercase tracking-tighter text-white">
-          Workout Catalog
+          Workouts
         </h2>
-        <p className="text-white/40 uppercase tracking-widest text-[10px] mt-1 font-bold">
-          Select your training protocol
-        </p>
       </div>
 
       <Button

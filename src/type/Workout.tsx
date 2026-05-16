@@ -6,7 +6,7 @@ export type Workout = {
   name: string;
   category: string;
   description?: string;
-  estimatedDurationMinutes: number;
+  duration: number;
   difficultyLevel: number;
   baseXp: number;
   calories?: number;

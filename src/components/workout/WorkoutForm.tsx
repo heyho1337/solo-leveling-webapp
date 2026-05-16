@@ -15,7 +15,6 @@ export function WorkoutForm({
   exerciseOptions,
   workoutCategoryOptions,
   exercises,
-  computedBaseXp,
   isSubmitting,
   editingWorkout,
   handleSubmit,
@@ -36,7 +35,7 @@ export function WorkoutForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div className="space-y-1">
           <Autocomplete
             label="Category"
@@ -48,22 +47,10 @@ export function WorkoutForm({
             required
           />
         </div>
-
-        <div className="space-y-1">
-          <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
-            Duration (Min)
-          </label>
-          <NumberInput
-            value={formData.estimatedDurationMinutes}
-            onChange={(value) => setFormData({ ...formData, estimatedDurationMinutes: value })}
-            min={5}
-            step={5}
-            max={999}
-          />
-        </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      {/*
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
         <div className="space-y-1">
           <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
             Calories
@@ -78,14 +65,19 @@ export function WorkoutForm({
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-black uppercase tracking-widest text-white/40">
-            Estimated XP
+          <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
+            Duration (Min)
           </label>
-          <div className="rounded border border-white/10 bg-white/5 px-3 py-3 text-[10px] uppercase tracking-[0.3em] text-white font-black">
-            +{computedBaseXp} XP
-          </div>
+          <NumberInput
+            value={formData.duration}
+            onChange={(value) => setFormData({ ...formData, duration: value })}
+            min={5}
+            step={5}
+            max={999}
+          />
         </div>
       </div>
+      */}
 
       <div className="space-y-1">
         <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
@@ -100,7 +92,7 @@ export function WorkoutForm({
           placeholder="Training details..."
         />
       </div>
-
+      
       <div className="space-y-3">
         <Autocomplete
           label="Exercises"
@@ -111,7 +103,8 @@ export function WorkoutForm({
           multiple
           noResultsLabel="No exercises available"
         />
-
+      
+        {/*
         <div className="flex flex-wrap gap-2">
           {formData.selectedExerciseIds.length === 0 ? (
             <p className="text-[10px] text-white/40">No exercises selected yet.</p>
@@ -145,15 +138,16 @@ export function WorkoutForm({
             })
           )}
         </div>
+        */}
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="w-full h-12">
         {isSubmitting ? (
           <Loader2 className="animate-spin h-5 w-5 mx-auto" />
         ) : editingWorkout ? (
-          'UPDATE PROTOCOL'
+          'Update workout'
         ) : (
-          'FINALIZE PROTOCOL'
+          'New workout'
         )}
       </Button>
     </form>

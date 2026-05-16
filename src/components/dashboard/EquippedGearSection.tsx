@@ -15,10 +15,10 @@ export const EquippedGearSection = ({ equipment = [] }: EquippedGearSectionProps
   const equipmentLayout = [
     { slot: "helmet", label: "HEAD" },
     { slot: "necklace", label: "NECK" },
-    { slot: "main_hand", label: "MAIN" },
+    { slot: "main_hand", label: "MAIN WEAPON" },
     { slot: "armor", label: "BODY" },
     { slot: "bracelet", label: "ARMS" },
-    { slot: "off_hand", label: "OFF" },
+    { slot: "off_hand", label: "OFFHAND WEAPON" },
     { slot: "gloves", label: "HANDS" },
     { slot: "ring", label: "RING" },
     { slot: "shoes", label: "FEET" },
@@ -28,7 +28,7 @@ export const EquippedGearSection = ({ equipment = [] }: EquippedGearSectionProps
     <section className="equippedGear">
       <CardHeader>
         <CardTitle className="mt-[20px] text-[20px] font-black uppercase tracking-widest text-white/60">
-          Equipped gear
+          Items
         </CardTitle>
       </CardHeader>
       <CardContent className="Inventory grid grid-cols-3 gap-3">
@@ -53,7 +53,7 @@ export const EquippedGearSection = ({ equipment = [] }: EquippedGearSectionProps
                         alt={item.name}
                         className="w-8 h-8 group-hover:opacity-100 transition-opacity"
                       />
-                      <span className="text-[8px] font-bold uppercase tracking-[0.1em] text-white/80 system-text-glow-strong">
+                      <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-white/80 system-text-glow-strong">
                         {label}
                       </span>
                     </div>
