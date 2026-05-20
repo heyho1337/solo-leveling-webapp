@@ -1,5 +1,5 @@
-import { Workout } from '@/type/Workout';
-import { Exercise } from '@/type/Exercise';
+import { Workout } from '@/Interface/workout/WorkoutInterface';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 
 export interface WorkoutGridProps {
   workouts: Workout[];

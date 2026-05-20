@@ -1,6 +1,6 @@
 "use client";
 
-import { Exercise } from '@/type/Exercise';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 import { Card, CardContent } from '@/components/ui/Card';
 import { ExerciseCard } from '@/components/exercise/ExerciseCard';
 import { getResourceId } from '@/lib/resourceUtils';

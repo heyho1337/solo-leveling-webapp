@@ -1,15 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import api from '@/services/api';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { getResourceId } from '@/lib/resourceUtils';
-import { Exercise } from '@/type/Exercise';
-import axios from 'axios';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 import { ExerciseHeader } from '@/components/exercise/ExerciseHeader';
 import { ExerciseGrid } from '@/components/exercise/ExerciseGrid';
 import { ExerciseModal } from '@/components/exercise/ExerciseModal';
 import { ExerciseForm } from '@/components/exercise/ExerciseForm';
+import { submitExerciseForm, deleteExercise } from '@/app/actions/exercises';
 
 const getExerciseTypeFromCategory = (category: string) => {
   const map: Record<string, string> = {
@@ -108,30 +107,28 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
       if (editingExercise) {
         const exerciseId = getResourceId(editingExercise);
         if (!exerciseId) throw new Error('Missing exercise id');
-        await api.patch(`/users/me/exercises/${exerciseId}`, payload, {
-          headers: { 'Content-Type': 'application/merge-patch+json' },
-        });
+        
+        const result = await submitExerciseForm(payload, exerciseId);
+        if (!result.success) throw new Error(result.error);
+
         setExercisesList((prev) =>
           prev.map((ex) =>
             getResourceId(ex) === exerciseId
-              ? { ...ex, ...payload, repCount: payload.repCount, setCount: payload.setCount, duration: payload.duration, distance: payload.distance, weightKg: payload.weightKg }
+              ? { ...ex, ...payload, repCount: payload.repCount, setCount: payload.setCount, duration: payload.duration, distance: payload.distance, weightKg: Number(payload.weightKg) }
               : ex
           )
         );
       } else {
-        const response = await api.post('/users/me/exercises', payload);
-        setExercisesList((prev) => [...prev, response.data]);
+        const result = await submitExerciseForm(payload);
+        if (!result.success) throw new Error(result.error);
+        setExercisesList((prev) => [...prev, result.data]);
       }
 
       setIsModalOpen(false);
       setEditingExercise(null);
       setExercisePage(1);
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error('Save failed:', err.response?.data ?? err.message);
-      } else {
-        console.error('Save failed:', err);
-      }
+      console.error('Save failed:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -146,7 +143,7 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
       repCount: exercise.repCount || 10,
       setCount: exercise.setCount || 4,
       duration: exercise.duration || 0,
-      distance: exercise.distance || 500,
+      distance: exercise.distance || 1,
       weightKg: exercise.weightKg || 20,
     });
     setIsModalOpen(true);
@@ -186,7 +183,10 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
     try {
       const exerciseId = typeof exercise === 'string' ? exercise : getResourceId(exercise);
       if (!exerciseId) throw new Error('Missing exercise id');
-      await api.delete(`/users/me/exercises/${exerciseId}`);
+      
+      const result = await deleteExercise(exerciseId);
+      if (!result.success) throw new Error(result.error);
+
       // refresh exercises after deletion through parent data update
       setExercisesList((prev) => prev.filter((ex) => getResourceId(ex) !== exerciseId));
     } catch (err) {
@@ -226,7 +226,7 @@ export function ExerciseContent({ exercises }: ExerciseContentProps) {
       <ExerciseGrid
         exercises={visibleExercises}
         isLoading={false}
-        sentinelRef={exerciseSentinelRef}
+        sentinelRef={exerciseSentinelRef as any}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />

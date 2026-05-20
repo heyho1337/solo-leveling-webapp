@@ -2,7 +2,7 @@
  * Helpers for API Platform JSON-LD resources (IRIs, embedded ids, display).
  */
 
-import { Exercise } from "@/type/Exercise";
+import { Exercise } from "@/Interface/exercise/ExerciseInterface";
 
 const API_V1_BASE =
   (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) || 'http://localhost:8000/api/v1';

@@ -6,7 +6,7 @@ import { NumberInput } from '@/components/ui/NumberInput';
 import { Autocomplete } from '@/components/ui/Autocomplete';
 import { Button } from '@/components/ui/Button';
 import { Loader2 } from 'lucide-react';
-import { Exercise } from '@/type/Exercise';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 
 interface FormData {
   name: string;
@@ -97,19 +97,21 @@ export const ExerciseForm = ({
               value={formData.setCount}
               onChange={(value) => setFormData({ ...formData, setCount: value })}
               min={0}
-              step={0.5}
+              step={1}
             />
           </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
-              Reps
-            </label>
-            <NumberInput
-              value={formData.repCount}
-              onChange={(value) => setFormData({ ...formData, repCount: value })}
-              min={1}
-            />
-          </div>
+          {(formData.category !== 'MartialArts') && (
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
+                Reps
+              </label>
+              <NumberInput
+                value={formData.repCount}
+                onChange={(value) => setFormData({ ...formData, repCount: value })}
+                min={1}
+              />
+            </div>
+          )}
           {(formData.category === 'Weightlifting' || formData.category === 'Crossfit') && (
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
@@ -140,7 +142,7 @@ export const ExerciseForm = ({
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
-              Distance (m)
+              Distance (km)
             </label>
             <NumberInput
               value={formData.distance}

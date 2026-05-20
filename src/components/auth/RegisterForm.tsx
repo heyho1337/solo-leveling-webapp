@@ -8,16 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { SystemFrame } from '@/components/ui/SystemFrame';
 import { SystemAlert } from '@/components/ui/SystemAlert';
 import Link from 'next/link';
-import { authService } from '@/services/authService';
-
-type ApiResponseError = {
-  response?: {
-    data?: {
-      'hydra:description'?: string;
-      message?: string;
-    };
-  };
-};
+import { registerUser } from '@/app/actions/auth';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -55,34 +46,22 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterValues) => {
     try {
-      await authService.register({
+      const result = await registerUser({
         username: data.username,
         email: data.email,
         password: data.password,
       });
+
+      if (!result.success) throw new Error(result.error);
+
       setIsSuccess(true);
       setAlert({
         message: 'REGISTRATION COMPLETE. AN ACTIVATION LINK HAS BEEN SENT TO YOUR COORDINATES (EMAIL).',
         isVisible: true,
         type: 'success'
       });
-    } catch (error: unknown) {
-      const apiError = error as any;
-      let errorMessage = 'Registration failed';
-
-      if (apiError.response?.data?.violations?.[0]?.message) {
-        errorMessage = apiError.response.data.violations[0].message;
-      } else if (apiError.response?.data?.detail) {
-        errorMessage = apiError.response.data.detail;
-      } else if (apiError.response?.data?.description) {
-        errorMessage = apiError.response.data.description;
-      } else if (apiError.response?.data?.['hydra:description']) {
-        errorMessage = apiError.response.data['hydra:description'];
-      } else if (apiError.response?.data?.message) {
-        errorMessage = apiError.response.data.message;
-      }
-      
-      setAlert({ message: errorMessage.toUpperCase(), isVisible: true, type: 'error' });
+    } catch (error: any) {
+      setAlert({ message: (error.message || 'REGISTRATION FAILED').toUpperCase(), isVisible: true, type: 'error' });
     }
   };
 

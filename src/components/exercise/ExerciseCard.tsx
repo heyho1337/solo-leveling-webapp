@@ -2,7 +2,7 @@
 
 import { Activity, Trash2, Edit2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
-import { Exercise } from '@/type/Exercise';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 import { getResourceId } from '@/lib/resourceUtils';
 import { ExerciseCardProps } from '@/Interface/exercise/ExerciseCardPropsInterface';
 import { ExerciseStat } from '@/components/exercise/ExerciseStat';

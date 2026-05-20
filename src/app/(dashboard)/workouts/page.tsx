@@ -1,53 +1,29 @@
 import { WorkoutContent } from '@/components/workout/WorkoutContent';
-import api from '@/services/api';
-import { cookies } from 'next/headers';
+import { getWorkouts } from '@/app/actions/workouts';
+import { getExercises } from '@/app/actions/exercises';
+import { getCurrentUser } from '@/app/actions/utils';
 import { redirect } from 'next/navigation';
-import { User } from '@/Interface/dashboard/UserInterface';
 
 export default async function WorkoutPage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-
-  if (!token) {
+  const userResult = await getCurrentUser();
+  
+  if (!userResult.success) {
     redirect('/login');
   }
 
-  try {
-    const response = await api.get('/users/me', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const userData = response.data as User;
-    
-    if (!userData.hasCompletedQuestionnaire) {
-      redirect('/onboarding');
-    }
-
-    const workoutResponse = await api.get('/users/me/workout', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const workoutData = workoutResponse.data;
-
-    const exerciseResponse = await api.get('/users/me/exercises', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const exerciseData = exerciseResponse.data;
-
-    return <WorkoutContent workouts={workoutData} exercises={exerciseData}/>;
-  } catch (error: any) {
-    console.log(error);
-    if (error.response?.status === 401) {
-      //redirect('/login');
-    }
-    // Handle other errors or throw
-    //redirect('/login');
+  if (!userResult.data.hasCompletedQuestionnaire) {
+    redirect('/onboarding');
   }
+
+  const [workoutResult, exerciseResult] = await Promise.all([
+    getWorkouts(),
+    getExercises()
+  ]);
+
+  if (!workoutResult.success || !exerciseResult.success) {
+    console.error('Failed to fetch data:', workoutResult.error || exerciseResult.error);
+    return <div>Failed to load workout data.</div>;
+  }
+
+  return <WorkoutContent workouts={workoutResult.data} exercises={exerciseResult.data}/>;
 }

@@ -1,26 +1,11 @@
 import { ReactNode } from 'react';
-import { cookies } from 'next/headers';
-import api from '@/services/api';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
+import { getCurrentUser } from '@/app/actions/utils';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-
-  let user = null;
-  if (token) {
-    try {
-      const response = await api.get('/users/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      user = response.data;
-    } catch (error: any) {
-      console.error('Failed to fetch user in server layout:', error.message);
-    }
-  }
+  const userResult = await getCurrentUser();
+  const user = userResult.success ? userResult.data : null;
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden relative bg-[url('/images/system/dashboard.png')] bg-cover bg-fixed bg-center">

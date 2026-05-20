@@ -1,13 +1,17 @@
+import { Workout } from "../workout/WorkoutInterface";
+
 export interface Quest {
   id: string;
   name: string;
   description?: string;
-  status?: "active" | "completed";
   scheduledFor?: string;
-  workout?: {
-    id: string;
-    name: string;
-    description?: string;
-};
+  status?: string;
+  progress?: number;
+  completedAt?: string;
+  calories?: number;
+  xp?: number;
   isHidden?: boolean;
+  isPreset?: boolean;
+  gold?: number;
+  workout?: Workout | null;
 }

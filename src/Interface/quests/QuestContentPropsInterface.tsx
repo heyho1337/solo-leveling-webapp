@@ -1,5 +1,5 @@
 import { Quest } from "./QuestInterface";
-import { Workout } from "./WorkoutInterface";
+import { Workout } from "../workout/WorkoutInterface";
 
 export interface QuestContentProps {
   activeQuests: Quest[];

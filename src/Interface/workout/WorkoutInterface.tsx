@@ -1,6 +1,6 @@
-import { Exercise } from '@/type/Exercise';
+import { Exercise } from '../exercise/ExerciseInterface';
 
-export type Workout = {
+export interface Workout {
   id: string;
   '@id'?: string;
   name: string;
@@ -12,4 +12,4 @@ export type Workout = {
   calories?: number;
   isPreset?: boolean;
   exercises?: Array<Exercise | string>;
-};
+}

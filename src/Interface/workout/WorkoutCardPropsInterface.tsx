@@ -1,5 +1,5 @@
-import { Exercise } from '@/type/Exercise';
-import { Workout } from '@/type/Workout';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
+import { Workout } from '@/Interface/workout/WorkoutInterface';
 
 export interface WorkoutCardProps {
   workout: Workout;

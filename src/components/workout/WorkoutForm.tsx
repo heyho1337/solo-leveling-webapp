@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { NumberInput } from '@/components/ui/NumberInput';
 import { Autocomplete } from '@/components/ui/Autocomplete';
 import { Loader2 } from 'lucide-react';
-import { Exercise } from '@/type/Exercise';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 import { getResourceId } from '@/lib/resourceUtils';
 import { WorkoutFormProps } from '@/Interface/workout/WorkoutFormPropsInterface';
 

@@ -84,7 +84,7 @@ export const EquippedGearSection = ({ equipment = [] }: EquippedGearSectionProps
                           key={stat}
                           className="pt-1 pb-1 pl-2 pr-2 border-white/40 border-[1px] text-[12px] text-white system-text-glow-strong font-medium"
                         >
-                          {stat.toUpperCase()}: +{value}
+                          {stat.toUpperCase()}: +{value as any}
                           {index < arr.length - 1 ? ", " : ""}
                         </span>
                       ))}

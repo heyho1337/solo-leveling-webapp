@@ -2,7 +2,8 @@
 
 import { Card } from '@/components/ui/Card';
 import { WorkoutCard } from './WorkoutCard';
-import { WorkoutGridProps } from '@/Interface/WorkoutGridPropsInterface';
+import { WorkoutGridProps } from '@/Interface/workout/WorkoutGridPropsInterface';
+import { Workout } from '@/Interface/workout/WorkoutInterface';
 
 
 export function WorkoutGrid({
@@ -28,7 +29,7 @@ export function WorkoutGrid({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {workouts.map((workout, idx) => (
+        {workouts.map((workout: Workout, idx: number) => (
           <WorkoutCard
             key={idx}
             workout={workout}

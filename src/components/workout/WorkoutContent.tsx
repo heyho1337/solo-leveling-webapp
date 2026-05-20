@@ -1,15 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import api from '@/services/api';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { getResourceId, resourceIri } from '@/lib/resourceUtils';
-import { Exercise } from '@/type/Exercise';
-import { Workout } from '@/type/Workout';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
+import { Workout } from '@/Interface/workout/WorkoutInterface';
 import { WorkoutHeader } from './WorkoutHeader';
 import { WorkoutModal } from './WorkoutModal';
 import { WorkoutForm } from './WorkoutForm';
 import { WorkoutGrid } from './WorkoutGrid';
+import { submitWorkoutForm, deleteWorkout } from '@/app/actions/workouts';
 
 const WORKOUT_CATEGORIES = [
   'Weightlifting',
@@ -105,20 +105,22 @@ export function WorkoutContent({
 
         if (!workoutId) throw new Error('Missing workout id');
 
-        await api.patch(`/users/me/workout/${workoutId}`, payload, {
-          headers: { 'Content-Type': 'application/merge-patch+json' },
-        });
+        const result = await submitWorkoutForm(payload, workoutId);
+        if (!result.success) throw new Error(result.error);
+
+        const updatedWorkout = result.data as Workout;
 
         setWorkoutsList((prev) =>
           prev.map((w) =>
             (getResourceId(w) || w.id || String(w['@id'] ?? '')) === workoutId
-              ? { ...w, ...payload, exercises: formData.selectedExerciseIds.map((id) => resourceIri('exercises', id)) }
+              ? updatedWorkout
               : w
           )
         );
       } else {
-        const response = await api.post('/users/me/workout', payload);
-        setWorkoutsList((prev) => [...prev, response.data]);
+        const result = await submitWorkoutForm(payload);
+        if (!result.success) throw new Error(result.error);
+        setWorkoutsList((prev) => [...prev, result.data]);
       }
 
       setIsModalOpen(false);
@@ -142,7 +144,7 @@ export function WorkoutContent({
     setFormData({
       name: workout.name,
       category: workout.category,
-      description: workout.description,
+      description: workout.description || '',
       duration: workout.duration,
       calories: workout.calories || 0,
       selectedExerciseIds: newSelectedExerciseIds,
@@ -153,7 +155,9 @@ export function WorkoutContent({
 
   const handleDelete = async (workoutId: string) => {
     try {
-      await api.delete(`/users/me/workout/${workoutId}`);
+      const result = await deleteWorkout(workoutId);
+      if (!result.success) throw new Error(result.error);
+      
       setWorkoutsList((prev) =>
         prev.filter((w) => (getResourceId(w) || w.id || String(w['@id'] ?? '')) !== workoutId)
       );

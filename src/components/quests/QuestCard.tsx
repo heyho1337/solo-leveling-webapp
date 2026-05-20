@@ -6,10 +6,11 @@ import {
   formatWorkoutExercise,
   getResourceId,
 } from '@/lib/resourceUtils';
-import { Quest } from '@/type/Quest';
-import { Workout } from '@/type/Workout';
-import { Exercise } from '@/type/Exercise';
+import { Quest } from '@/Interface/quests/QuestInterface';
+import { Workout } from '@/Interface/workout/WorkoutInterface';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 import { ExerciseStat } from '../exercise/ExerciseStat';
+import { ExerciseListAccordion } from '../exercise/ExerciseListAccordion';
 
 export function QuestCard({
   quest,
@@ -69,7 +70,7 @@ export function QuestCard({
                   Workout Duration
                 </p>
                 <p className="text-white font-black text-sm uppercase">
-                  {workout.duration ?? 0} MINS
+                  {workout.duration ?? 0} MIN
                 </p>
               </div>
               <div className="bg-black/40 p-3 border border-white/5">
@@ -77,27 +78,13 @@ export function QuestCard({
                   Calories
                 </p>
                 <p className="text-orange-300 font-black text-sm uppercase">
-                  {quest.calories} KCAL
+                  {quest.workout?.calories} KCAL
                 </p>
               </div>
             </div>
 
             {(workout.exercises || []).length > 0 ? (
-              <div className="pt-2 space-y-2 border-t border-white/5">
-                <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">
-                  Exercises
-                </p>
-                <ul className="space-y-3 max-h-56 overflow-y-auto pr-1">
-                  {(workout.exercises as Exercise[]).map((item, index) => {
-                    return (
-                      <li key={`workout-${workout.id}-exercise-${item.id}`} className="text-[10px] grid gap-2 text-white/70">
-                        <span className="font-bold text-[14px] text-white/80">{item.name}</span>
-                        <ExerciseStat exercise={item} category={item.category} />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              <ExerciseListAccordion exercises={workout.exercises as Exercise[]} workout={workout} />
             ) : null}
           </div>
         ) : null}

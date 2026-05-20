@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { UserStats } from "@/type/UserStats";
+import { UserStats } from "@/Interface/dashboard/UserStatsInterface";
 
 interface StatusSectionProps {
   stats?: UserStats;

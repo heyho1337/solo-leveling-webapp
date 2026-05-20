@@ -25,6 +25,20 @@ export function QuestSections({
 }: QuestSectionsProps) {
   return (
     <>
+      {!activeQuests.length && !completedQuests.length && !missedQuests.length ? (
+        <Card className="border-white/10 bg-white/5">
+          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <Swords className="h-8 w-8 text-white/30" />
+            <h3 className="text-sm font-black uppercase tracking-widest text-white/80">
+              No quests available
+            </h3>
+            <Button variant="primary" onClick={handleOpenCreate}>
+              <Plus className="h-4 w-4" />
+              Create Your First Quest
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <section className="space-y-6">
           <div className="flex items-center gap-4 text-[#38bdf8]">
@@ -98,11 +112,6 @@ export function QuestSections({
                       onEdit={() => onEdit(quest)}
                       onDelete={() => onDelete(quest)}
                       className="opacity-60 grayscale transition-opacity hover:opacity-100 hover:grayscale-0"
-                      headerRight={
-                        <span className="border border-[#4ade80]/20 bg-[#4ade80]/15 px-2 py-0.5 text-[10px] font-black text-[#4ade80]">
-                          COMPLETED
-                        </span>
-                      }
                     />
                   );
                 })}
@@ -165,25 +174,6 @@ export function QuestSections({
             )}
           </div>
         </section>
-
-      {!activeQuests.length && !completedQuests.length && !missedQuests.length ? (
-        <Card className="border-white/10 bg-white/5">
-          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-            <Swords className="h-8 w-8 text-white/30" />
-            <h3 className="text-sm font-black uppercase tracking-widest text-white/80">
-              No quests available
-            </h3>
-            <p className="max-w-md text-[11px] uppercase tracking-[0.2em] text-white/40">
-              Create your first quest or assign a workout-based protocol to begin
-              tracking progress.
-            </p>
-            <Button variant="primary" onClick={handleOpenCreate}>
-              <Plus className="h-4 w-4" />
-              Create First Quest
-            </Button>
-          </CardContent>
-        </Card>
-      ) : null}
     </>
   );
 }

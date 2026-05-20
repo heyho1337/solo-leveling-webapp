@@ -5,7 +5,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/Card";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { getResourceId } from "@/lib/resourceUtils";
 import { QuestCard } from "@/components/quests/QuestCard";
-import { Quest } from "@/type/Quest";
+import { Quest } from "@/Interface/quests/QuestInterface";
 
 interface QuestListSectionProps {
   quests: Quest[];

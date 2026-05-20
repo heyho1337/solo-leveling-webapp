@@ -9,17 +9,8 @@ import { SystemFrame } from '@/components/ui/SystemFrame';
 import { SystemAlert } from '@/components/ui/SystemAlert';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { authService } from '@/services/authService';
-import api from '@/services/api';
-
-type ApiResponseError = {
-  response?: {
-    data?: {
-      message?: string;
-      'hydra:description'?: string;
-    };
-  };
-};
+import { loginUser, resendVerification } from '@/app/actions/auth';
+import { getCurrentUser } from '@/app/actions/utils';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -52,42 +43,39 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginValues) => {
     try {
-      await authService.login({ usernameOrEmail: data.email, password: data.password });
+      const loginResult = await loginUser({ usernameOrEmail: data.email, password: data.password });
 
-      const meResponse = await api.get('/users/me');
-      const user = meResponse.data;
+      if (!loginResult.success) {
+        if (loginResult.error === 'EMAIL_NOT_VERIFIED') {
+          setUnverifiedEmail(data.email);
+          setAlert({
+            message: 'YOUR ACCOUNT IS NOT YET VERIFIED. CHECK YOUR EMAIL OR REQUEST A NEW LINK.',
+            isVisible: true,
+          });
+          return;
+        }
+        throw new Error(loginResult.error);
+      }
+
+      // Sync localStorage for client-side axios if it's still used anywhere, 
+      // although we should eventually remove it.
+      if (loginResult.data.access_token) {
+        localStorage.setItem('token', loginResult.data.access_token);
+        localStorage.setItem('refreshToken', loginResult.data.refresh_token);
+      }
+
+      const userResult = await getCurrentUser();
+      if (!userResult.success) throw new Error(userResult.error);
+      
+      const user = userResult.data;
 
       if (!user.hasCompletedQuestionnaire) {
         router.push('/onboarding');
       } else {
         router.push('/dashboard');
       }
-    } catch (error: unknown) {
-      const apiError = error as any;
-      let description = 'ACCESS DENIED. INVALID CREDENTIALS.';
-
-      if (apiError.response?.data?.message === 'EMAIL_NOT_VERIFIED') {
-        setUnverifiedEmail(data.email);
-        setAlert({
-          message: 'YOUR ACCOUNT IS NOT YET VERIFIED. CHECK YOUR EMAIL OR REQUEST A NEW LINK.',
-          isVisible: true,
-        });
-        return;
-      }
-
-      if (apiError.response?.data?.violations?.[0]?.message) {
-        description = apiError.response.data.violations[0].message;
-      } else if (apiError.response?.data?.detail) {
-        description = apiError.response.data.detail;
-      } else if (apiError.response?.data?.description) {
-        description = apiError.response.data.description;
-      } else if (apiError.response?.data?.message) {
-        description = apiError.response.data.message;
-      } else if (apiError.response?.data?.['hydra:description']) {
-        description = apiError.response.data['hydra:description'];
-      }
-
-      setAlert({ message: description.toUpperCase(), isVisible: true });
+    } catch (error: any) {
+      setAlert({ message: (error.message || 'ACCESS DENIED. INVALID CREDENTIALS.').toUpperCase(), isVisible: true });
     }
   };
 
@@ -95,10 +83,11 @@ export function LoginForm() {
     if (!unverifiedEmail) return;
     setIsResending(true);
     try {
-      await authService.resendVerification(unverifiedEmail);
+      const result = await resendVerification(unverifiedEmail);
+      if (!result.success) throw new Error(result.error);
       setAlert({ message: 'VERIFICATION LINK RESENT. CHECK YOUR EMAIL.', isVisible: true });
-    } catch {
-      setAlert({ message: 'FAILED TO RESEND. TRY AGAIN LATER.', isVisible: true });
+    } catch (error: any) {
+      setAlert({ message: (error.message || 'FAILED TO RESEND. TRY AGAIN LATER.').toUpperCase(), isVisible: true });
     } finally {
       setIsResending(false);
     }

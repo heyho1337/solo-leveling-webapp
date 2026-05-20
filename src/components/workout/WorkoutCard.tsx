@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/Button';
 import { Edit2, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getResourceId } from '@/lib/resourceUtils';
-import { Exercise } from '@/type/Exercise';
+import { Exercise } from '@/Interface/exercise/ExerciseInterface';
 import { WorkoutCardProps } from '@/Interface/workout/WorkoutCardPropsInterface';
 import { ExerciseCard } from '@/components/exercise/ExerciseCard';
 import { ExerciseStat } from '../exercise/ExerciseStat';
+import { ExerciseListAccordion } from '../exercise/ExerciseListAccordion';
 
 export function WorkoutCard({ workout, index, exercises, onEdit, onDelete }: WorkoutCardProps) {
   const workoutId = getResourceId(workout) || workout.id || String(workout['@id'] ?? '');
@@ -80,25 +81,11 @@ export function WorkoutCard({ workout, index, exercises, onEdit, onDelete }: Wor
               <span className="text-[#38bdf8] system-text-glow-strong">{workout.calories} KCAL</span>
             </div>
 
-            <div className="pt-2 space-y-2">
-              <p className="text-[14px] text-white/80 uppercase font-black system-text-glow-strong tracking-widest">
-                Exercises
-              </p>
-
-              {linkedExercises.length === 0 ? (
+            {linkedExercises.length === 0 ? (
                 <p className="text-[10px] text-white/25">No exercises linked yet.</p>
               ) : (
-                <ul className="space-y-2">
-                  {linkedExercises.map((exercise, idx) => (
-                    <li key={`${workoutKey}-${idx}`} className="text-[10px] grid gap-2 text-white/70">
-                      <span className="font-bold text-[14px] text-white/80">{exercise.name}</span>
-
-                      <ExerciseStat exercise={exercise} category={exercise.category} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+                <ExerciseListAccordion exercises={linkedExercises} workout={workout} />
+            )}
           </div>
         </CardContent>
       </Card>

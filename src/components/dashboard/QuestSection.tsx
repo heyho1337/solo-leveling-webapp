@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Quest } from "@/type/Quest";
+import { Quest } from "@/Interface/quests/QuestInterface";
 import { QuestTabsSection } from "./QuestTabsSection";
 import { QuestListSection } from "./QuestListSection";
 

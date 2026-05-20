@@ -1,45 +1,26 @@
 import { ExerciseContent } from '@/components/exercise/ExerciseContent';
-import api from '@/services/api';
-import { cookies } from 'next/headers';
+import { getExercises } from '@/app/actions/exercises';
+import { getCurrentUser } from '@/app/actions/utils';
 import { redirect } from 'next/navigation';
-import { User } from '@/Interface/dashboard/UserInterface';
 
 export default async function ExercisePage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-
-  if (!token) {
+  const userResult = await getCurrentUser();
+  
+  if (!userResult.success) {
     redirect('/login');
   }
 
-  try {
-    const response = await api.get('/users/me', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const userData = response.data as User;
-    
-    if (!userData.hasCompletedQuestionnaire) {
-      redirect('/onboarding');
-    }
-
-    const exerciseResponse = await api.get('/users/me/exercises', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const exerciseData = exerciseResponse.data;
-
-    return <ExerciseContent exercises={exerciseData}/>;
-  } catch (error: any) {
-    console.log(error);
-    if (error.response?.status === 401) {
-      //redirect('/login');
-    }
-    // Handle other errors or throw
-    //redirect('/login');
+  if (!userResult.data.hasCompletedQuestionnaire) {
+    redirect('/onboarding');
   }
+
+  const exerciseResult = await getExercises();
+
+  if (!exerciseResult.success) {
+    // Handle error, maybe show a message or redirect
+    console.error('Failed to fetch exercises:', exerciseResult.error);
+    return <div>Failed to load exercises.</div>;
+  }
+
+  return <ExerciseContent exercises={exerciseResult.data}/>;
 }

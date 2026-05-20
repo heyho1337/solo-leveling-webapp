@@ -2,18 +2,9 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { authService } from '@/services/authService';
+import { verifyUser } from '@/app/actions/auth';
 import { SystemFrame } from '@/components/ui/SystemFrame';
 import { Button } from '@/components/ui/Button';
-
-type ApiResponseError = {
-  response?: {
-    data?: {
-      'hydra:description'?: string;
-      message?: string;
-    };
-  };
-};
 
 function VerifyContent() {
   const searchParams = useSearchParams();
@@ -34,13 +25,14 @@ function VerifyContent() {
 
     const verify = async () => {
       try {
-        await authService.verify(token);
+        const result = await verifyUser(token);
+        if (!result.success) throw new Error(result.error);
+        
         setStatus('success');
         setMessage('AUTHENTICATION SUCCESSFUL. IDENTITY VERIFIED.');
-      } catch (error: unknown) {
-        const apiError = error as ApiResponseError;
+      } catch (error: any) {
         setStatus('error');
-        setMessage(apiError.response?.data?.['hydra:description'] || 'VERIFICATION FAILED. TOKEN EXPIRED OR INVALID.');
+        setMessage(error.message || 'VERIFICATION FAILED. TOKEN EXPIRED OR INVALID.');
       }
     };
 

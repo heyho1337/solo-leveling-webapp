@@ -1,4 +1,4 @@
-export type Exercise = {
+export interface Exercise {
   id: string;
   '@id'?: string;
   name: string;
@@ -10,4 +10,4 @@ export type Exercise = {
   setCount?: number | null;
   repCount?: number | null;
   weightKg?: number | null;
-};
+}

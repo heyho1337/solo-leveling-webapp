@@ -1,10 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Autocomplete } from "@/components/ui/Autocomplete";
 import { Loader2 } from "lucide-react";
 import { QuestFormProps } from "@/Interface/quests/QuestFormPropsInterface";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export function QuestForm({
   formData,
@@ -15,6 +25,8 @@ export function QuestForm({
   handleWorkoutSelection,
   handleSubmit,
 }: QuestFormProps) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1">
@@ -33,7 +45,7 @@ export function QuestForm({
           placeholder={
             formData.selectedWorkoutId
               ? "Workout selected automatically"
-              : "e.g. MORNING MOBILITY RITUAL"
+              : "e.g. MORNING RUN"
           }
         />
       </div>
@@ -61,7 +73,7 @@ export function QuestForm({
       <div className="space-y-3">
         <Autocomplete
           label="Assign Workout"
-          placeholder="Search workout templates..."
+          placeholder="Select a workout"
           items={workoutOptions}
           value={formData.selectedWorkoutId}
           onChange={(value) => handleWorkoutSelection(String(value))}
@@ -99,17 +111,40 @@ export function QuestForm({
         <label className="text-[10px] font-black uppercase tracking-widest text-[#38bdf8]">
           Scheduled Date
         </label>
-        <Input
-          type="date"
-          required
-          value={formData.scheduledFor}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFormData((prev) => ({
-              ...prev,
-              scheduledFor: e.target.value,
-            }))
-          }
-        />
+        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-required="true"
+              className="flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/40 px-3 text-left text-sm text-white uppercase tracking-widest font-bold transition hover:border-[#38bdf8]"
+            >
+              <span className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 text-[#38bdf8]" />
+                {formData.scheduledFor
+                  ? format(new Date(formData.scheduledFor), "PPP")
+                  : "Choose scheduled date"}
+              </span>
+            </button>
+          </PopoverTrigger>
+
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              selected={
+                formData.scheduledFor
+                  ? new Date(formData.scheduledFor)
+                  : undefined
+              }
+              onSelect={(date: any) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  scheduledFor: date ? format(date, "yyyy-MM-dd") : "",
+                }));
+                if (date) setCalendarOpen(false);
+              }}
+              className="bg-transparent"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="h-12 w-full">

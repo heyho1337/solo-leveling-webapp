@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import axios from "axios";
-import api from "@/services/api";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { getResourceId, resourceIri } from "@/lib/resourceUtils";
 import { QuestHeader } from "@/components/quests/QuestHeader";
@@ -11,6 +9,7 @@ import { QuestForm } from "@/components/quests/QuestForm";
 import { QuestSections } from "@/components/quests/QuestSections";
 import { Quest } from "@/Interface/quests/QuestInterface";
 import { QuestContentProps } from "@/Interface/quests/QuestContentPropsInterface";
+import { submitQuestForm, deleteQuest } from "@/app/actions/quests";
 
 const defaultFormData = {
   questName: "",
@@ -20,20 +19,21 @@ const defaultFormData = {
 };
 
 export default function QuestContent({
-  activeQuests: activeQuests = [],
+  activeQuests: initialActiveQuests = [],
   workouts = [],
-  completedQuests: completedQuests = [],
-  missedQuests: missedQuests = [], 
+  completedQuests: initialCompletedQuests = [],
+  missedQuests: initialMissedQuests = [], 
 }: QuestContentProps) {
-  // Local state for optimistic CRUD updates
-  const [activeQuestsList, setActiveQuestsList] = useState<Quest[]>(activeQuests);
-  const [completedQuestsList, setCompletedQuestsList] = useState<Quest[]>(completedQuests);
-  const [missedQuestsList, setMissedQuestsList] = useState<Quest[]>(missedQuests);
+  // Local state for optimistic CRUD updates - initialize from props once
+  const [activeQuestsList, setActiveQuestsList] = useState<Quest[]>(initialActiveQuests);
+  const [completedQuestsList, setCompletedQuestsList] = useState<Quest[]>(initialCompletedQuests);
+  const [missedQuestsList, setMissedQuestsList] = useState<Quest[]>(initialMissedQuests);
   const [searchQuery, setSearchQuery] = useState("");
   const isLoading = false;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+  const [editingQuestId, setEditingQuestId] = useState("");
   const [activePage, setActivePage] = useState(1);
   const [completedPage, setCompletedPage] = useState(1);
   const [missedPage, setMissedPage] = useState(1);
@@ -49,66 +49,67 @@ export default function QuestContent({
 
   const normalizedSearch = searchQuery.trim().toLowerCase();
 
-  activeQuests = useMemo(() => {
-    if (!normalizedSearch) return activeQuests;
+  // Derive filtered quests from state, not props
+  const filteredActiveQuests = useMemo(() => {
+    if (!normalizedSearch) return activeQuestsList;
 
-    return activeQuests.filter((item) =>
+    return activeQuestsList.filter((item) =>
       [item.name, item.description, item.workout?.name]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch))
     );
-  }, [activeQuests, normalizedSearch]);
+  }, [activeQuestsList, normalizedSearch]);
 
-  completedQuests = useMemo(() => {
-    if (!normalizedSearch) return completedQuests;
+  const filteredCompletedQuests = useMemo(() => {
+    if (!normalizedSearch) return completedQuestsList;
 
-    return completedQuests.filter((item) =>
+    return completedQuestsList.filter((item) =>
       [item.name, item.description, item.workout?.name]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch))
     );
-  }, [completedQuests, normalizedSearch]);
+  }, [completedQuestsList, normalizedSearch]);
 
-  missedQuests = useMemo(() => {
-    if (!normalizedSearch) return missedQuests;
+  const filteredMissedQuests = useMemo(() => {
+    if (!normalizedSearch) return missedQuestsList;
 
-    return missedQuests.filter((item) =>
+    return missedQuestsList.filter((item) =>
       [item.name, item.description, item.workout?.name]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(normalizedSearch))
     );
-  }, [missedQuests, normalizedSearch]);
+  }, [missedQuestsList, normalizedSearch]);
 
   const visibleActiveQuests = useMemo(
-    () => activeQuests.slice(0, activePage * 6),
-    [activeQuests, activePage]
+    () => filteredActiveQuests.slice(0, activePage * 6),
+    [filteredActiveQuests, activePage]
   );
 
   const visibleCompletedQuests = useMemo(
-    () => completedQuests.slice(0, completedPage * 6),
-    [completedQuests, completedPage]
+    () => filteredCompletedQuests.slice(0, completedPage * 6),
+    [filteredCompletedQuests, completedPage]
   );
 
   const visibleMissedQuests = useMemo(
-    () => missedQuests.slice(0, missedPage * 6),
-    [missedQuests, missedPage]
+    () => filteredMissedQuests.slice(0, missedPage * 6),
+    [filteredMissedQuests, missedPage]
   );
 
   const activeSentinelRef = useInfiniteScroll({
     loading: isLoading,
-    hasMore: activeQuests.length > visibleActiveQuests.length,
+    hasMore: filteredActiveQuests.length > visibleActiveQuests.length,
     onLoadMore: () => setActivePage((prev) => prev + 1),
   });
 
   const completedSentinelRef = useInfiniteScroll({
     loading: isLoading,
-    hasMore: completedQuests.length > visibleCompletedQuests.length,
+    hasMore: filteredCompletedQuests.length > visibleCompletedQuests.length,
     onLoadMore: () => setCompletedPage((prev) => prev + 1),
   });
 
   const missedSentinelRef = useInfiniteScroll({
     loading: isLoading,
-    hasMore: missedQuests.length > visibleMissedQuests.length,
+    hasMore: filteredMissedQuests.length > visibleMissedQuests.length,
     onLoadMore: () => setMissedPage((prev) => prev + 1),
   });
 
@@ -124,9 +125,26 @@ export default function QuestContent({
     [workouts]
   );
 
+  const getQuestId = (quest: Quest | string | null | undefined): string => {
+    if (typeof quest === "string") return quest;
+    if (!quest) return "";
+
+    const directId = (quest as Quest).id;
+    if (directId) return String(directId);
+
+    const resourceId = getResourceId(quest);
+    if (resourceId) return resourceId;
+
+    const atId = (quest as any)["@id"];
+    if (typeof atId === "string") return getResourceId(atId);
+
+    return "";
+  };
+
   const resetForm = () => {
     setFormData(defaultFormData);
     setEditingQuest(null);
+    setEditingQuestId("");
   };
 
   const handleWorkoutSelection = (workoutId: string) => {
@@ -143,6 +161,7 @@ export default function QuestContent({
 
   const handleEdit = (quest: Quest) => {
     setEditingQuest(quest);
+    setEditingQuestId(getQuestId(quest));
     setFormData({
       questName: quest.name ?? "",
       description: quest.description ?? "",
@@ -157,17 +176,26 @@ export default function QuestContent({
   };
 
   const handleDelete = async (quest: Quest | string) => {
-    const questId = typeof quest === "string" ? quest : getResourceId(quest);
+    const questId = getQuestId(quest);
 
-    if (!questId) return;
+    if (!questId) {
+      console.error("Delete failed: no quest id", { quest });
+      return;
+    }
+
+    // Keep original quest for rollback
+    const originalList = activeQuestsList;
 
     // Optimistic removal
-    setActiveQuestsList((prev) => prev.filter((q) => getResourceId(q) !== questId));
+    setActiveQuestsList((prev) => prev.filter((q) => getQuestId(q) !== questId));
 
     try {
-      await api.delete(`/users/me/quests/${questId}`);
+      const result = await deleteQuest(questId);
+      if (!result.success) throw new Error(result.error);
     } catch (err) {
       console.error("Delete failed", err);
+      // Rollback on error
+      setActiveQuestsList(originalList);
     }
   };
 
@@ -177,9 +205,17 @@ export default function QuestContent({
 
     try {
       if (editingQuest) {
-        const questId = getResourceId(editingQuest) || editingQuest.id;
+        const questId = getQuestId(editingQuestId || editingQuest);
 
-        if (!questId) throw new Error("Missing quest id");
+        if (!questId) {
+          console.error("Edit failed: quest has no id or @id", {
+            editingQuest,
+            editingQuestId,
+            resourceId: getResourceId(editingQuest),
+            directId: editingQuest.id,
+          });
+          throw new Error("Missing quest id");
+        }
 
         const payload: Record<string, unknown> = {
           name: formData.questName,
@@ -191,23 +227,15 @@ export default function QuestContent({
           payload.workout = resourceIri("workouts", formData.selectedWorkoutId);
         }
 
-        await api.patch(`/users/me/quests/${questId}`, payload, {
-          headers: { "Content-Type": "application/merge-patch+json" },
-        });
+        const result = await submitQuestForm(payload, questId);
+        if (!result.success) throw new Error(result.error);
 
-        // Optimistic update
+        const updatedQuest = result.data as Quest;
+
         setActiveQuestsList((prev) =>
           prev.map((q) => {
-            const qId = getResourceId(q) || q.id;
-            if (qId === questId) {
-              return {
-                ...q,
-                name: formData.questName,
-                description: formData.description.trim() || "No description provided.",
-                scheduledFor: formData.scheduledFor,
-              };
-            }
-            return q;
+            const qId = getQuestId(q);
+            return qId === questId ? updatedQuest : q;
           })
         );
       } else {
@@ -222,8 +250,10 @@ export default function QuestContent({
           payload.workout = resourceIri("workouts", formData.selectedWorkoutId);
         }
 
-        const response = await api.post("/users/me/quests", payload);
-        const newQuest = response.data as Quest;
+        const result = await submitQuestForm(payload);
+        if (!result.success) throw new Error(result.error);
+
+        const newQuest = result.data as Quest;
 
         // Optimistic add
         setActiveQuestsList((prev) => [...prev, newQuest]);
@@ -233,11 +263,7 @@ export default function QuestContent({
       resetForm();
       setActivePage(1);
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error("Save failed", err.response?.data ?? err.message);
-      } else {
-        console.error("Save failed", err);
-      }
+      console.error("Save failed", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -254,7 +280,7 @@ export default function QuestContent({
       <QuestModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingQuest ? "Modify Requirement" : "Assign New Protocol"}
+        title={editingQuest ? "Update quest" : "Create new quest"}
       >
         <QuestForm
           formData={formData}
@@ -269,15 +295,15 @@ export default function QuestContent({
 
       <QuestSections
         isLoading={isLoading}
-        activeQuests={activeQuests}
-        completedQuests={completedQuests}
-        missedQuests={missedQuests}
+        activeQuests={filteredActiveQuests}
+        completedQuests={filteredCompletedQuests}
+        missedQuests={filteredMissedQuests}
         visibleActiveQuests={visibleActiveQuests}
         visibleCompletedQuests={visibleCompletedQuests}
         visibleMissedQuests={visibleMissedQuests}
-        activeSentinelRef={activeSentinelRef}
-        completedSentinelRef={completedSentinelRef}
-        missedSentinelRef={missedSentinelRef}
+        activeSentinelRef={activeSentinelRef as any}
+        completedSentinelRef={completedSentinelRef as any}
+        missedSentinelRef={missedSentinelRef as any}
         onEdit={handleEdit}
         onDelete={handleDelete}
         handleOpenCreate={handleOpenCreate}
